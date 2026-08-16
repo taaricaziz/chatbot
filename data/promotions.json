@@ -1,0 +1,49 @@
+{
+  "promotions": [
+    {
+      "id": "promo-01",
+      "name": "10% Off Orders Over $20",
+      "rule": "Get 10% off your entire order when your subtotal is $20 or more.",
+      "discount": {
+        "type": "percentage",
+        "value": 10
+      },
+      "eligibility": {
+        "minSubtotal": 20.00
+      },
+      "active": true
+    },
+    {
+      "id": "promo-02",
+      "name": "Free Pastry with Any Large Coffee",
+      "rule": "Order any Large-sized Coffee category drink and get one Pastries category item free (the lowest-priced eligible pastry).",
+      "discount": {
+        "type": "free_item",
+        "value": "cheapest_item_in_free_category"
+      },
+      "eligibility": {
+        "requiresCategory": "Coffee",
+        "requiresSize": "Large",
+        "freeItemCategory": "Pastries"
+      },
+      "active": true
+    },
+    {
+      "id": "promo-03",
+      "name": "Happy Hour: 15% Off Cold Drinks",
+      "rule": "15% off all Cold Drinks category items, ordered between 2:00 PM and 4:00 PM.",
+      "discount": {
+        "type": "percentage",
+        "value": 15
+      },
+      "eligibility": {
+        "requiresCategory": "Cold Drinks",
+        "timeWindow": {
+          "start": "14:00",
+          "end": "16:00"
+        }
+      },
+      "active": false
+    }
+  ]
+}

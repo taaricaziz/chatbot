@@ -1,0 +1,118 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f3ede6;
+  color: #2b1d14;
+  padding: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+  font-size: 20px;
+}
+
+.dashboard-header button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #6f4e37;
+  color: #fffaf5;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dashboard-header button:hover {
+  background: #4b2e1e;
+}
+
+.orders-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.order-card {
+  background: #fffaf5;
+  border: 1px solid #e6dccd;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.order-id {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.order-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-new {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.status-preparing {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-ready {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-completed {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.order-detail {
+  font-size: 13px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.order-controls {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.order-controls select {
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #d9cbb8;
+  font-size: 13px;
+}
+
+.empty-state {
+  color: #7a6a5a;
+  font-size: 14px;
+}
