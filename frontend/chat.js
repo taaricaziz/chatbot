@@ -1,14 +1,10 @@
-// Mock chat behavior only — no AI API, database, or authentication connected.
-
 const chatArea = document.getElementById("chatArea");
 const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
+const sendButton = chatForm.querySelector(".send-button");
 
-const MOCK_BOT_REPLIES = [
-  "Thanks for your message! (This is a mock reply — CafeBot isn't connected to a real AI yet.)",
-  "Got it! (Mock response — no live ordering logic wired up yet.)",
-  "Noted! (This is placeholder UI text for testing the chat layout.)",
-];
+let sessionId = null;
+let history = [];
 
 function addMessage(text, sender) {
   const message = document.createElement("div");
@@ -21,14 +17,10 @@ function addMessage(text, sender) {
   message.appendChild(bubble);
   chatArea.appendChild(message);
   chatArea.scrollTop = chatArea.scrollHeight;
+  return message;
 }
 
-function getMockReply() {
-  const index = Math.floor(Math.random() * MOCK_BOT_REPLIES.length);
-  return MOCK_BOT_REPLIES[index];
-}
-
-chatForm.addEventListener("submit", (event) => {
+chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const text = chatInput.value.trim();
@@ -37,7 +29,36 @@ chatForm.addEventListener("submit", (event) => {
   addMessage(text, "customer");
   chatInput.value = "";
   chatInput.focus();
+  chatInput.disabled = true;
+  sendButton.disabled = true;
 
-  // Mock bot reply after a short delay to simulate a response.
-  setTimeout(() => addMessage(getMockReply(), "bot"), 500);
+  const typingMessage = addMessage("...", "bot");
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, history, sessionId }),
+    });
+
+    const data = await res.json();
+    typingMessage.remove();
+
+    if (!res.ok) {
+      addMessage(data.error || "Sorry, something went wrong. Please try again.", "bot");
+      return;
+    }
+
+    sessionId = data.sessionId;
+    history.push({ role: "user", content: text });
+    history.push({ role: "assistant", content: data.reply });
+    addMessage(data.reply, "bot");
+  } catch (err) {
+    typingMessage.remove();
+    addMessage("Sorry, I couldn't connect. Please check your connection and try again.", "bot");
+  } finally {
+    chatInput.disabled = false;
+    sendButton.disabled = false;
+    chatInput.focus();
+  }
 });
