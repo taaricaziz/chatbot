@@ -37,9 +37,8 @@ body {
   flex-shrink: 0;
 }
 
-.chat-header-icon {
-  font-size: 28px;
-  line-height: 1;
+.chat-header-logo {
+  flex-shrink: 0;
 }
 
 .chat-header-text h1 {

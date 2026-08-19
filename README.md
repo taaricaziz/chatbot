@@ -1,4 +1,4 @@
-# CafeBot
+# Gootee Cafe
 
 An AI café assistant chatbot — helps customers browse the menu, get
 recommendations, and place pickup or delivery orders through a chat

@@ -18,6 +18,12 @@ body {
   margin-bottom: 20px;
 }
 
+.dashboard-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .dashboard-header h1 {
   font-size: 20px;
 }
