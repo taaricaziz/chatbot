@@ -12,8 +12,8 @@ interface. Staff track incoming orders on a simple dashboard.
   `promotions.json`, `orders.json` (no real database)
 - `frontend/` — the customer chat UI (`index.html`) and the staff
   dashboard (`dashboard.html`)
-- `backend/` — the Express server: the `/api/chat` endpoint, order
-  tools, and the orders API used by the dashboard
+- `backend/` — the Express server: the `/api/chat` and `/api/sms`
+  endpoints, order tools, and the orders API used by the dashboard
 - `.env.example` — placeholder names for environment variables (no real
   secrets)
 
@@ -42,6 +42,7 @@ interface. Staff track incoming orders on a simple dashboard.
    | `AI_API_KEY` | Yes | Your Anthropic API key |
    | `AI_MODEL` | No | Defaults to `claude-opus-5` if unset |
    | `PORT` | No | Defaults to `3000` if unset |
+   | `TWILIO_AUTH_TOKEN` | No | Verifies incoming SMS webhooks are really from Twilio (see [SMS Ordering](#sms-ordering-twilio) below) |
 
 3. **Run the server**
 
@@ -54,8 +55,32 @@ interface. Staff track incoming orders on a simple dashboard.
    - Customer chat UI: `http://localhost:3000/`
    - Staff dashboard: `http://localhost:3000/dashboard.html`
    - Chat API: `POST http://localhost:3000/api/chat`
+   - SMS webhook: `POST http://localhost:3000/api/sms`
    - Orders API: `GET http://localhost:3000/api/orders`,
      `PATCH http://localhost:3000/api/orders/:orderId/status`
+
+## SMS Ordering (Twilio)
+
+Customers can text the same ordering assistant. It reuses the exact same
+menu grounding, order tools, and safety rules as the chat UI — only the
+transport is different.
+
+1. Buy or use an existing Twilio phone number with SMS enabled.
+2. In the Twilio Console, set that number's **"A message comes in"**
+   webhook to `POST` your deployed `/api/sms` URL (e.g.
+   `https://your-app.up.railway.app/api/sms`).
+3. Set `TWILIO_AUTH_TOKEN` (found on your Twilio Console dashboard) as an
+   environment variable on your host. This lets the server verify that
+   incoming requests actually came from Twilio, not just anyone who finds
+   the URL — the request is rejected with `403` if the signature doesn't
+   match. If left unset, requests are accepted unverified (fine for local
+   testing only).
+4. Text the number — each phone number gets its own conversation and
+   order, kept in memory just like a browser chat session, keyed by phone
+   number instead of a session ID.
+
+Voice calls are a separate, much larger feature (real-time speech-to-text
+and text-to-speech) and are not implemented here.
 
 ## Data & Storage
 

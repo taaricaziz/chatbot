@@ -4,8 +4,10 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const express = require("express");
+const twilio = require("twilio");
 const Anthropic = require("@anthropic-ai/sdk");
 const { getOrderState } = require("./orderState");
+const { getSmsHistory } = require("./smsSessions");
 const {
   addItemToOrderTool,
   executeAddItemToOrder,
@@ -132,7 +134,9 @@ function buildSystemPrompt() {
 const FRONTEND_PATH = path.resolve(__dirname, "..", "frontend");
 
 const app = express();
+app.set("trust proxy", true); // needed so req.protocol is correct behind Railway's/Vercel's proxy, for Twilio signature checks
 app.use(express.json());
+app.use(express.urlencoded({ extended: false })); // Twilio webhooks post form-encoded bodies
 app.use(express.static(FRONTEND_PATH));
 
 app.get("/api/orders", (req, res) => {
@@ -160,6 +164,52 @@ app.patch("/api/orders/:orderId/status", (req, res) => {
   res.json({ order: result.order });
 });
 
+async function getChatReply(order, message, history) {
+  const messages = [...(history || []), { role: "user", content: message }];
+  const system = buildSystemPrompt();
+
+  let response = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 1024,
+    system,
+    tools: TOOLS,
+    messages,
+  });
+
+  let iterations = 0;
+  while (response.stop_reason === "tool_use" && iterations < MAX_TOOL_ITERATIONS) {
+    iterations += 1;
+    messages.push({ role: "assistant", content: response.content });
+
+    const toolResults = response.content
+      .filter((block) => block.type === "tool_use")
+      .map((block) => {
+        const result = runTool(order, block);
+        return {
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: result.content,
+          is_error: result.isError,
+        };
+      });
+
+    messages.push({ role: "user", content: toolResults });
+
+    response = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 1024,
+      system,
+      tools: TOOLS,
+      messages,
+    });
+  }
+
+  order.total = calculateOrderTotals(order).total;
+
+  const textBlock = response.content.find((block) => block.type === "text");
+  return textBlock ? textBlock.text : "Sorry, I'm having trouble completing that — could you try again?";
+}
+
 app.post("/api/chat", async (req, res) => {
   const { message, history, sessionId: incomingSessionId } = req.body || {};
 
@@ -174,57 +224,51 @@ app.post("/api/chat", async (req, res) => {
     typeof incomingSessionId === "string" && incomingSessionId ? incomingSessionId : crypto.randomUUID();
   const order = getOrderState(sessionId);
 
-  const messages = [...(history || []), { role: "user", content: message }];
-  const system = buildSystemPrompt();
-
   try {
-    let response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 1024,
-      system,
-      tools: TOOLS,
-      messages,
-    });
-
-    let iterations = 0;
-    while (response.stop_reason === "tool_use" && iterations < MAX_TOOL_ITERATIONS) {
-      iterations += 1;
-      messages.push({ role: "assistant", content: response.content });
-
-      const toolResults = response.content
-        .filter((block) => block.type === "tool_use")
-        .map((block) => {
-          const result = runTool(order, block);
-          return {
-            type: "tool_result",
-            tool_use_id: block.id,
-            content: result.content,
-            is_error: result.isError,
-          };
-        });
-
-      messages.push({ role: "user", content: toolResults });
-
-      response = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 1024,
-        system,
-        tools: TOOLS,
-        messages,
-      });
-    }
-
-    order.total = calculateOrderTotals(order).total;
-
-    const textBlock = response.content.find((block) => block.type === "text");
-    res.json({
-      reply: textBlock ? textBlock.text : "Sorry, I'm having trouble completing that — could you try again?",
-      sessionId,
-      order,
-    });
+    const reply = await getChatReply(order, message, history);
+    res.json({ reply, sessionId, order });
   } catch (err) {
     console.error("CafeBot chat request failed:", err.message);
     res.status(502).json({ error: "Failed to get a response from the AI service." });
+  }
+});
+
+app.post("/api/sms", async (req, res) => {
+  if (process.env.TWILIO_AUTH_TOKEN) {
+    const signature = req.headers["x-twilio-signature"];
+    const url = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+    const isValid = twilio.validateRequest(process.env.TWILIO_AUTH_TOKEN, signature, url, req.body);
+    if (!isValid) {
+      return res.status(403).send("Invalid Twilio signature.");
+    }
+  } else {
+    console.warn("Warning: TWILIO_AUTH_TOKEN is not set — incoming SMS requests are not verified.");
+  }
+
+  const from = req.body.From;
+  const body = req.body.Body;
+  const twiml = new twilio.twiml.MessagingResponse();
+
+  if (typeof from !== "string" || !from || typeof body !== "string" || !body.trim()) {
+    twiml.message("Sorry, I didn't get that. Please try texting again.");
+    res.type("text/xml").send(twiml.toString());
+    return;
+  }
+
+  const order = getOrderState(from);
+  const history = getSmsHistory(from);
+
+  try {
+    const reply = await getChatReply(order, body, history);
+    history.push({ role: "user", content: body });
+    history.push({ role: "assistant", content: reply });
+
+    twiml.message(reply.replace(/\*\*/g, ""));
+    res.type("text/xml").send(twiml.toString());
+  } catch (err) {
+    console.error("CafeBot SMS request failed:", err.message);
+    twiml.message("Sorry, I'm having trouble right now. Please try again in a moment.");
+    res.type("text/xml").send(twiml.toString());
   }
 });
 
