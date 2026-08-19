@@ -98,6 +98,26 @@ body {
   border-bottom-right-radius: 4px;
 }
 
+.bubble p {
+  margin: 0 0 6px;
+}
+
+.bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.bubble ul {
+  margin: 0 0 6px 18px;
+}
+
+.bubble ul:last-child {
+  margin-bottom: 0;
+}
+
+.bubble li {
+  margin: 2px 0;
+}
+
 /* Input bar */
 .chat-input-bar {
   display: flex;

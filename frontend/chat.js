@@ -6,13 +6,51 @@ const sendButton = chatForm.querySelector(".send-button");
 let sessionId = null;
 let history = [];
 
+function parseInline(line) {
+  return line.split(/(\*\*[^*]+\*\*)/g).filter(Boolean).map((part) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      const strong = document.createElement("strong");
+      strong.textContent = part.slice(2, -2);
+      return strong;
+    }
+    return document.createTextNode(part);
+  });
+}
+
+function renderBotText(bubble, text) {
+  const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+  let currentList = null;
+
+  lines.forEach((line) => {
+    const bulletMatch = line.match(/^[-*]\s+(.*)/);
+    if (bulletMatch) {
+      if (!currentList) {
+        currentList = document.createElement("ul");
+        bubble.appendChild(currentList);
+      }
+      const li = document.createElement("li");
+      parseInline(bulletMatch[1]).forEach((node) => li.appendChild(node));
+      currentList.appendChild(li);
+    } else {
+      currentList = null;
+      const p = document.createElement("p");
+      parseInline(line).forEach((node) => p.appendChild(node));
+      bubble.appendChild(p);
+    }
+  });
+}
+
 function addMessage(text, sender) {
   const message = document.createElement("div");
   message.className = `message ${sender}`;
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.textContent = text;
+  if (sender === "bot") {
+    renderBotText(bubble, text);
+  } else {
+    bubble.textContent = text;
+  }
 
   message.appendChild(bubble);
   chatArea.appendChild(message);
