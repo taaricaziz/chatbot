@@ -1,0 +1,7 @@
+{
+  "name": "cafebot",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}
