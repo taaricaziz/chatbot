@@ -12,8 +12,9 @@ interface. Staff track incoming orders on a simple dashboard.
   `promotions.json`, `orders.json` (no real database)
 - `frontend/` — the customer chat UI (`index.html`) and the staff
   dashboard (`dashboard.html`)
-- `backend/` — the Express server: the `/api/chat` and `/api/sms`
-  endpoints, order tools, and the orders API used by the dashboard
+- `backend/` — the Express server: the `/api/chat`, `/api/sms` (Twilio),
+  and `/api/vonage-sms` (Vonage) endpoints, order tools, and the orders
+  API used by the dashboard
 - `.env.example` — placeholder names for environment variables (no real
   secrets)
 
@@ -42,7 +43,11 @@ interface. Staff track incoming orders on a simple dashboard.
    | `AI_API_KEY` | Yes | Your Anthropic API key |
    | `AI_MODEL` | No | Defaults to `claude-opus-5` if unset |
    | `PORT` | No | Defaults to `3000` if unset |
-   | `TWILIO_AUTH_TOKEN` | No | Verifies incoming SMS webhooks are really from Twilio (see [SMS Ordering](#sms-ordering-twilio) below) |
+   | `TWILIO_AUTH_TOKEN` | No | Verifies incoming SMS webhooks are really from Twilio (see [SMS Ordering — Twilio](#sms-ordering-twilio) below) |
+   | `VONAGE_API_KEY` | No | Your Vonage API key — required to send SMS replies via Vonage |
+   | `VONAGE_API_SECRET` | No | Your Vonage API secret |
+   | `VONAGE_FROM_NUMBER` | No | Your Vonage virtual number replies are sent from |
+   | `VONAGE_WEBHOOK_TOKEN` | No | Shared secret verifying incoming Vonage webhooks (see [SMS Ordering — Vonage](#sms-ordering-vonage) below) |
 
 3. **Run the server**
 
@@ -55,7 +60,8 @@ interface. Staff track incoming orders on a simple dashboard.
    - Customer chat UI: `http://localhost:3000/`
    - Staff dashboard: `http://localhost:3000/dashboard.html`
    - Chat API: `POST http://localhost:3000/api/chat`
-   - SMS webhook: `POST http://localhost:3000/api/sms`
+   - SMS webhook (Twilio): `POST http://localhost:3000/api/sms`
+   - SMS webhook (Vonage): `POST http://localhost:3000/api/vonage-sms`
    - Orders API: `GET http://localhost:3000/api/orders`,
      `PATCH http://localhost:3000/api/orders/:orderId/status`
 
@@ -81,6 +87,29 @@ transport is different.
 
 Voice calls are a separate, much larger feature (real-time speech-to-text
 and text-to-speech) and are not implemented here.
+
+## SMS Ordering (Vonage)
+
+An alternative to Twilio — same shared order engine and history store,
+just a different provider. Unlike Twilio, Vonage can't reply inline in
+the webhook response, so replies are sent via a separate outbound API call.
+
+1. In the [Vonage API dashboard](https://dashboard.nexmo.com), create an
+   API secret (Settings → API Settings → Create new secret — it can only
+   be viewed once, so copy it immediately) and note your API key.
+2. Buy an SMS-capable virtual number (Numbers → Buy Number).
+3. On that number's settings, set the inbound SMS webhook to `POST` your
+   deployed `/api/vonage-sms` URL. If you're using `VONAGE_WEBHOOK_TOKEN`
+   (see below), append it as a query string, e.g.
+   `https://your-app.up.railway.app/api/vonage-sms?token=YOUR_TOKEN`.
+4. Set these environment variables on your host:
+   - `VONAGE_API_KEY` and `VONAGE_API_SECRET` — used to send replies.
+   - `VONAGE_FROM_NUMBER` — the virtual number replies are sent from.
+   - `VONAGE_WEBHOOK_TOKEN` (optional but recommended) — a secret you make
+     up yourself, matched against the `?token=` query param on incoming
+     requests. Vonage's classic SMS webhook isn't cryptographically
+     signed like Twilio's, so this is the lightweight alternative — if
+     left unset, incoming requests are accepted unverified.
 
 ## Data & Storage
 

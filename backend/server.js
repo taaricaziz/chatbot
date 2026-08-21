@@ -272,6 +272,63 @@ app.post("/api/sms", async (req, res) => {
   }
 });
 
+// Vonage doesn't support replying inline in the webhook response (unlike Twilio's TwiML),
+// so we acknowledge immediately and send the reply back via a separate outbound API call.
+async function sendVonageSms(to, text) {
+  const params = new URLSearchParams({
+    api_key: process.env.VONAGE_API_KEY,
+    api_secret: process.env.VONAGE_API_SECRET,
+    from: process.env.VONAGE_FROM_NUMBER,
+    to,
+    text,
+  });
+
+  const res = await fetch("https://rest.nexmo.com/sms/json", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
+
+  const data = await res.json();
+  const failedMessage = (data.messages || []).find((m) => m.status !== "0");
+  if (failedMessage) {
+    console.error("Vonage SMS send failed:", failedMessage["error-text"] || JSON.stringify(failedMessage));
+  }
+}
+
+app.post("/api/vonage-sms", async (req, res) => {
+  if (process.env.VONAGE_WEBHOOK_TOKEN) {
+    if (req.query.token !== process.env.VONAGE_WEBHOOK_TOKEN) {
+      return res.status(403).send("Invalid webhook token.");
+    }
+  } else {
+    console.warn("Warning: VONAGE_WEBHOOK_TOKEN is not set — incoming Vonage SMS requests are not verified.");
+  }
+
+  const from = req.body.msisdn;
+  const body = req.body.text;
+  res.sendStatus(200); // acknowledge immediately; Vonage ignores the response body
+
+  if (typeof from !== "string" || !from || typeof body !== "string" || !body.trim()) {
+    return;
+  }
+
+  const order = getOrderState(from);
+  const history = getSmsHistory(from);
+
+  try {
+    const reply = await getChatReply(order, body, history);
+    history.push({ role: "user", content: body });
+    history.push({ role: "assistant", content: reply });
+    await sendVonageSms(from, reply.replace(/\*\*/g, ""));
+  } catch (err) {
+    console.error("CafeBot Vonage SMS request failed:", err.message);
+    await sendVonageSms(from, "Sorry, I'm having trouble right now. Please try again in a moment.").catch(
+      () => {}
+    );
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
   app.listen(PORT, () => {
