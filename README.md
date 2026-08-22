@@ -13,8 +13,8 @@ interface. Staff track incoming orders on a simple dashboard.
 - `frontend/` — the customer chat UI (`index.html`) and the staff
   dashboard (`dashboard.html`)
 - `backend/` — the Express server: the `/api/chat`, `/api/sms` (Twilio),
-  and `/api/vonage-sms` (Vonage) endpoints, order tools, and the orders
-  API used by the dashboard
+  `/api/vonage-sms` (Vonage), and `/api/telnyx-sms` (Telnyx) endpoints,
+  order tools, and the orders API used by the dashboard
 - `.env.example` — placeholder names for environment variables (no real
   secrets)
 
@@ -48,6 +48,9 @@ interface. Staff track incoming orders on a simple dashboard.
    | `VONAGE_API_SECRET` | No | Your Vonage API secret |
    | `VONAGE_FROM_NUMBER` | No | Your Vonage virtual number replies are sent from |
    | `VONAGE_WEBHOOK_TOKEN` | No | Shared secret verifying incoming Vonage webhooks (see [SMS Ordering — Vonage](#sms-ordering-vonage) below) |
+   | `TELNYX_API_KEY` | No | Your Telnyx API key — required to send SMS replies via Telnyx |
+   | `TELNYX_FROM_NUMBER` | No | Your Telnyx number replies are sent from |
+   | `TELNYX_WEBHOOK_TOKEN` | No | Shared secret verifying incoming Telnyx webhooks (see [SMS Ordering — Telnyx](#sms-ordering-telnyx) below) |
 
 3. **Run the server**
 
@@ -62,6 +65,7 @@ interface. Staff track incoming orders on a simple dashboard.
    - Chat API: `POST http://localhost:3000/api/chat`
    - SMS webhook (Twilio): `POST http://localhost:3000/api/sms`
    - SMS webhook (Vonage): `POST http://localhost:3000/api/vonage-sms`
+   - SMS webhook (Telnyx): `POST http://localhost:3000/api/telnyx-sms`
    - Orders API: `GET http://localhost:3000/api/orders`,
      `PATCH http://localhost:3000/api/orders/:orderId/status`
 
@@ -110,6 +114,29 @@ the webhook response, so replies are sent via a separate outbound API call.
      requests. Vonage's classic SMS webhook isn't cryptographically
      signed like Twilio's, so this is the lightweight alternative — if
      left unset, incoming requests are accepted unverified.
+
+## SMS Ordering (Telnyx)
+
+A third alternative, same shared order engine and history store. Like
+Vonage, Telnyx replies via a separate outbound API call rather than
+inline in the webhook response — but its inbound webhook is JSON, not
+form-encoded, and it sends several event types (`message.sent`,
+`message.received`, `message.finalized`, ...) to the same URL, so the
+handler only acts on `message.received`.
+
+1. In the [Telnyx Portal](https://portal.telnyx.com), create an API key
+   (API Keys & Tokens) and buy an SMS-capable number (Numbers).
+2. On that number's messaging settings, set the inbound webhook to
+   `POST` your deployed `/api/telnyx-sms` URL. If you're using
+   `TELNYX_WEBHOOK_TOKEN` (see below), append it as a query string, e.g.
+   `https://your-app.up.railway.app/api/telnyx-sms?token=YOUR_TOKEN`.
+3. Set these environment variables on your host:
+   - `TELNYX_API_KEY` — used to send replies.
+   - `TELNYX_FROM_NUMBER` — the number replies are sent from.
+   - `TELNYX_WEBHOOK_TOKEN` (optional but recommended) — a secret you
+     make up yourself, matched against the `?token=` query param, same
+     pattern as `VONAGE_WEBHOOK_TOKEN`. If left unset, incoming requests
+     are accepted unverified.
 
 ## Data & Storage
 

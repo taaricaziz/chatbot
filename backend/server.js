@@ -329,6 +329,70 @@ app.post("/api/vonage-sms", async (req, res) => {
   }
 });
 
+// Telnyx also replies via a separate outbound API call rather than inline in the webhook response,
+// and sends inbound webhooks as JSON (not form-encoded like Twilio/Vonage).
+async function sendTelnyxSms(to, text) {
+  const res = await fetch("https://api.telnyx.com/v2/messages", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.TELNYX_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: process.env.TELNYX_FROM_NUMBER,
+      to,
+      text,
+    }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    console.error("Telnyx SMS send failed:", JSON.stringify(data.errors || data));
+  }
+}
+
+app.post("/api/telnyx-sms", async (req, res) => {
+  if (process.env.TELNYX_WEBHOOK_TOKEN) {
+    if (req.query.token !== process.env.TELNYX_WEBHOOK_TOKEN) {
+      return res.status(403).send("Invalid webhook token.");
+    }
+  } else {
+    console.warn("Warning: TELNYX_WEBHOOK_TOKEN is not set — incoming Telnyx SMS requests are not verified.");
+  }
+
+  const event = req.body && req.body.data;
+  res.sendStatus(200); // acknowledge immediately; Telnyx ignores the response body
+
+  // Telnyx sends multiple event types (message.sent, message.finalized, etc.) to the same
+  // webhook — only reply to actually-received inbound messages.
+  if (!event || event.event_type !== "message.received") {
+    return;
+  }
+
+  const payload = event.payload || {};
+  const from = payload.from && payload.from.phone_number;
+  const body = payload.text;
+
+  if (typeof from !== "string" || !from || typeof body !== "string" || !body.trim()) {
+    return;
+  }
+
+  const order = getOrderState(from);
+  const history = getSmsHistory(from);
+
+  try {
+    const reply = await getChatReply(order, body, history);
+    history.push({ role: "user", content: body });
+    history.push({ role: "assistant", content: reply });
+    await sendTelnyxSms(from, reply.replace(/\*\*/g, ""));
+  } catch (err) {
+    console.error("CafeBot Telnyx SMS request failed:", err.message);
+    await sendTelnyxSms(from, "Sorry, I'm having trouble right now. Please try again in a moment.").catch(
+      () => {}
+    );
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
   app.listen(PORT, () => {
