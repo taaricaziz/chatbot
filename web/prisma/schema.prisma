@@ -1,0 +1,522 @@
+// Gootee Cafe — Phase 4: menu tables.
+//
+// This schema mirrors the SQL applied to the `gootee-cafe` Supabase project.
+// Once DATABASE_URL is set, run `npx prisma db pull` once to confirm this
+// file and the live database agree — hand-written schemas drift.
+//
+// Orders, reservations, table sessions and admin tables arrive in their own
+// phases. Do not add them ahead of the build sequence.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model MenuCategory {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  items MenuItem[]
+
+  @@map("menu_categories")
+}
+
+model MenuItem {
+  id         String @id @default(uuid()) @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+
+  name        String
+  slug        String @unique
+  description String
+
+  /// Integer paisa. Rs. 1,860 is 186000. A CHECK constraint in the database
+  /// rejects negatives, so the invariant is structural, not conventional.
+  pricePaisa Int @map("price_paisa")
+
+  imageUrl      String?  @map("image_url")
+  isVegetarian  Boolean  @default(false) @map("is_vegetarian")
+  isSpicy       Boolean  @default(false) @map("is_spicy")
+  isPopular     Boolean  @default(false) @map("is_popular")
+  isRecommended Boolean  @default(false) @map("is_recommended")
+  isAvailable   Boolean  @default(true) @map("is_available")
+  ingredients   String[] @default([])
+  allergens     String[] @default([])
+  calories      Int?
+  prepMinutes   Int      @default(15) @map("prep_minutes")
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  category  MenuCategory       @relation(fields: [categoryId], references: [id])
+  modifiers MenuItemModifier[]
+
+  @@index([categoryId, sortOrder])
+  @@map("menu_items")
+}
+
+model MenuModifier {
+  id              String   @id @default(uuid()) @db.Uuid
+  name            String
+  groupName       String   @map("group_name")
+  /// May be negative — "no cheese" can reduce the price.
+  priceDeltaPaisa Int      @default(0) @map("price_delta_paisa")
+  isRequired      Boolean  @default(false) @map("is_required")
+  maxSelect       Int      @default(1) @map("max_select")
+  sortOrder       Int      @default(0) @map("sort_order")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  items MenuItemModifier[]
+
+  @@map("menu_modifiers")
+}
+
+/// Join table — modifiers are reusable across items rather than duplicated.
+model MenuItemModifier {
+  menuItemId String @map("menu_item_id") @db.Uuid
+  modifierId String @map("modifier_id") @db.Uuid
+
+  menuItem MenuItem     @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  modifier MenuModifier @relation(fields: [modifierId], references: [id], onDelete: Cascade)
+
+  @@id([menuItemId, modifierId])
+  @@index([modifierId])
+  @@map("menu_item_modifiers")
+}
+
+// ============================================================
+// Phase 6 — orders
+// ============================================================
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+
+  @@map("order_type")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELLED
+
+  @@map("order_status")
+}
+
+enum OrderSource {
+  WEB
+  AGENT_CHAT
+  AGENT_SMS
+  AGENT_WHATSAPP
+  ADMIN
+  PHONE
+
+  @@map("order_source")
+}
+
+enum PaymentMethod {
+  CASH
+  CARD_ON_DELIVERY
+  CARD_AT_COUNTER
+  ONLINE
+
+  @@map("payment_method")
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  PAID
+  FAILED
+  REFUNDED
+
+  @@map("payment_status")
+}
+
+/// Identified by phone. No password — see the plan's guest-checkout decision.
+model Customer {
+  id              String   @id @default(uuid()) @db.Uuid
+  phone           String   @unique
+  name            String
+  email           String?
+  orderCount      Int      @default(0) @map("order_count")
+  totalSpentPaisa BigInt   @default(0) @map("total_spent_paisa")
+  firstSeenAt     DateTime @default(now()) @map("first_seen_at") @db.Timestamptz(6)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  orders       Order[]
+  reservations Reservation[]
+
+  @@map("customers")
+}
+
+model Order {
+  id          String  @id @default(uuid()) @db.Uuid
+  orderNumber String  @unique @map("order_number")
+  customerId  String? @map("customer_id") @db.Uuid
+
+  type   OrderType
+  status OrderStatus @default(PENDING)
+  source OrderSource @default(WEB)
+
+  subtotalPaisa    Int @map("subtotal_paisa")
+  discountPaisa    Int @default(0) @map("discount_paisa")
+  taxablePaisa     Int @map("taxable_paisa")
+  taxPaisa         Int @map("tax_paisa")
+  deliveryFeePaisa Int @default(0) @map("delivery_fee_paisa")
+  totalPaisa       Int @map("total_paisa")
+
+  /// The APPLIED rate in basis points (1500 cash / 800 digital), stored per
+  /// order so historical orders reconcile after a rate change.
+  taxRateBp Int @map("tax_rate_bp")
+
+  paymentMethod PaymentMethod @map("payment_method")
+
+  deliveryAddress      String? @map("delivery_address")
+  deliveryArea         String? @map("delivery_area")
+  deliveryLandmark     String? @map("delivery_landmark")
+  deliveryInstructions String? @map("delivery_instructions")
+
+  tableSessionId String? @map("table_session_id") @db.Uuid
+  deliveryZoneId String? @map("delivery_zone_id") @db.Uuid
+
+  scheduledFor DateTime? @map("scheduled_for") @db.Timestamptz(6)
+  notes        String?
+
+  /// NULL means never confirmed. Such a row must never reach the kitchen.
+  confirmedAt DateTime? @map("confirmed_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  customer        Customer?        @relation(fields: [customerId], references: [id])
+  tableSession    TableSession?    @relation(fields: [tableSessionId], references: [id])
+  deliveryZone    DeliveryZone?    @relation(fields: [deliveryZoneId], references: [id])
+  items           OrderItem[]
+  payments        Payment[]
+  notifications   Notification[]
+  idempotencyKeys IdempotencyKey[]
+
+  @@index([status, createdAt])
+  @@index([customerId])
+  @@index([tableSessionId])
+  @@map("orders")
+}
+
+/// Snapshots, not references — a menu edit must never rewrite a past receipt.
+model OrderItem {
+  id         String  @id @default(uuid()) @db.Uuid
+  orderId    String  @map("order_id") @db.Uuid
+  menuItemId String? @map("menu_item_id") @db.Uuid
+
+  itemNameSnapshot       String @map("item_name_snapshot")
+  unitPricePaisaSnapshot Int    @map("unit_price_paisa_snapshot")
+  quantity               Int
+  lineTotalPaisa         Int    @map("line_total_paisa")
+  notes                  String?
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  order          Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customizations OrderCustomization[]
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model OrderCustomization {
+  id          String  @id @default(uuid()) @db.Uuid
+  orderItemId String  @map("order_item_id") @db.Uuid
+  modifierId  String? @map("modifier_id") @db.Uuid
+
+  nameSnapshot            String @map("name_snapshot")
+  priceDeltaPaisaSnapshot Int    @map("price_delta_paisa_snapshot")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@index([orderItemId])
+  @@map("order_customizations")
+}
+
+/// Offline methods write a row too, so every order has a payment record.
+model Payment {
+  id          String  @id @default(uuid()) @db.Uuid
+  orderId     String  @map("order_id") @db.Uuid
+  provider    String  @default("OFFLINE")
+  providerRef String? @map("provider_ref")
+
+  method      PaymentMethod
+  amountPaisa Int           @map("amount_paisa")
+  status      PaymentStatus @default(PENDING)
+  rawResponse Json?         @map("raw_response")
+  paidAt      DateTime?     @map("paid_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+/// Agents retry, and so do phones on bad mobile data. One retried request
+/// must not become two dinners.
+model IdempotencyKey {
+  key       String   @id
+  orderId   String?  @map("order_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("idempotency_keys")
+}
+
+
+// ============================================================
+// Phase 7 — QR dine-in
+// ============================================================
+
+enum SeatingKind {
+  INDOOR
+  OUTDOOR
+
+  @@map("seating_kind")
+}
+
+enum SessionStatus {
+  OPEN
+  AWAITING_PAYMENT
+  CLOSED
+  ABANDONED
+
+  @@map("session_status")
+}
+
+model RestaurantTable {
+  id       String      @id @default(uuid()) @db.Uuid
+  label    String      @unique
+  capacity Int
+  seating  SeatingKind @default(INDOOR)
+  isActive Boolean     @default(true) @map("is_active")
+
+  /// Turn length, used by reservation availability in Phase 8.
+  turnMinutes Int @default(90) @map("turn_minutes")
+
+  /// 128-bit opaque token on the printed QR code. A guessable token would let
+  /// anyone order onto someone else's bill, so this is never sequential.
+  qrToken      String   @unique @map("qr_token")
+  qrRotatedAt  DateTime @default(now()) @map("qr_rotated_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  sessions     TableSession[]
+  reservations Reservation[]
+
+  @@map("restaurant_tables")
+}
+
+/// One party's visit. Several orders (rounds) roll up to one session.
+/// A partial unique index in the database allows only one OPEN or
+/// AWAITING_PAYMENT session per table — that is what stops a new party
+/// inheriting the previous party's bill.
+model TableSession {
+  id      String @id @default(uuid()) @db.Uuid
+  tableId String @map("table_id") @db.Uuid
+
+  status   SessionStatus @default(OPEN)
+  openedAt DateTime      @default(now()) @map("opened_at") @db.Timestamptz(6)
+  closedAt DateTime?     @map("closed_at") @db.Timestamptz(6)
+
+  guestLabel   String? @map("guest_label")
+  closedByNote String? @map("closed_by_note")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  table  RestaurantTable @relation(fields: [tableId], references: [id])
+  orders Order[]
+
+  @@index([status, openedAt])
+  @@map("table_sessions")
+}
+
+// ============================================================
+// Phase 8 — reservations
+// ============================================================
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  SEATED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+
+  @@map("reservation_status")
+}
+
+enum SeatingPref {
+  INDOOR
+  OUTDOOR
+  ANY
+
+  @@map("seating_pref")
+}
+
+/// Double-booking is prevented by a GiST exclusion constraint in the database
+/// (see the create_reservations migration), not by application logic — an
+/// overlapping booking on the same table is unrepresentable, so no code path
+/// can create one and there is no lock to forget to take.
+model Reservation {
+  id         String  @id @default(uuid()) @db.Uuid
+  reference  String  @unique
+  customerId String? @map("customer_id") @db.Uuid
+  tableId    String? @map("table_id") @db.Uuid
+
+  guestName  String  @map("guest_name")
+  guestPhone String  @map("guest_phone")
+  guestEmail String? @map("guest_email")
+
+  partySize Int @map("party_size")
+
+  startsAt DateTime @map("starts_at") @db.Timestamptz(6)
+  /// Derived from the table's turn length at booking time. Stored rather than
+  /// recomputed so overlap is a plain range query.
+  endsAt   DateTime @map("ends_at") @db.Timestamptz(6)
+
+  seating SeatingPref       @default(ANY)
+  status  ReservationStatus @default(PENDING)
+
+  occasion     String?
+  requests     String?
+  cancelledAt  DateTime? @map("cancelled_at") @db.Timestamptz(6)
+  cancelReason String?   @map("cancel_reason")
+
+  source OrderSource @default(WEB)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  customer      Customer?        @relation(fields: [customerId], references: [id])
+  table         RestaurantTable? @relation(fields: [tableId], references: [id])
+  notifications Notification[]
+
+  @@index([startsAt])
+  @@index([status, startsAt])
+  @@index([tableId, startsAt])
+  @@map("reservations")
+}
+
+// ============================================================
+// Phase 9 — delivery zones
+// ============================================================
+
+model DeliveryZone {
+  id   String @id @default(uuid()) @db.Uuid
+  name String @unique
+
+  feePaisa      Int @map("fee_paisa")
+  minOrderPaisa Int @default(0) @map("min_order_paisa")
+
+  /// An ETA window, never a single number — the system knows nothing about
+  /// traffic and must not imply that it does.
+  etaMinMinutes Int @map("eta_min_minutes")
+  etaMaxMinutes Int @map("eta_max_minutes")
+
+  /// Lowercase substrings matched against the customer's address.
+  matchTerms String[] @map("match_terms")
+
+  /// Lower wins when several zones match, so a specific area beats a
+  /// broad catch-all.
+  priority Int @default(100)
+
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  orders Order[]
+
+  @@map("delivery_zones")
+}
+
+// ============================================================
+// Phase 11 — notification outbox
+// ============================================================
+
+enum NotifChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+
+  @@map("notif_channel")
+}
+
+enum NotifStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+  DEAD
+
+  @@map("notif_status")
+}
+
+/// An outbox, not a log. Rows are queued in the same breath as the order and
+/// drained by a worker, so a provider outage can never fail an order the
+/// kitchen has already accepted.
+model Notification {
+  id String @id @default(uuid()) @db.Uuid
+
+  channel  NotifChannel
+  template String
+
+  /// Plain text, not a customer FK: an address can change after a message is
+  /// queued, and what matters later is where we ACTUALLY sent it.
+  recipient String
+
+  /// Rendered at send time, so a template fix reaches messages still queued.
+  payload Json @default("{}")
+
+  status   NotifStatus @default(PENDING)
+  attempts Int         @default(0)
+
+  nextAttemptAt DateTime  @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+  lastError     String?   @map("last_error")
+  sentAt        DateTime? @map("sent_at") @db.Timestamptz(6)
+
+  orderId       String? @map("order_id") @db.Uuid
+  reservationId String? @map("reservation_id") @db.Uuid
+
+  /// Stops a retried POST, or a second worker run, texting somebody twice.
+  dedupeKey String @unique @map("dedupe_key")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  order       Order?       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  @@index([nextAttemptAt])
+  @@index([orderId])
+  @@index([status, createdAt])
+  @@map("notifications")
+}

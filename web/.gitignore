@@ -1,17 +1,10 @@
-# Secrets — never commit real environment variables
-.env
-.env.local
-
-# Dependencies
 node_modules/
-
-# OS junk
-.DS_Store
-Thumbs.db
-
-# Logs
-npm-debug.log*
-*.log
+.next/
+out/
+.env
+.env*.local
+next-env.d.ts
+*.tsbuildinfo
 
 # Any env file, however it is suffixed. `.env` alone does NOT match
 # `.env.backup-...` or `.env.production`, and a backup of a working .env is

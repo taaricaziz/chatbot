@@ -1,0 +1,143 @@
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-block: var(--space-10) var(--space-7);
+  border-bottom: 1px solid var(--rule);
+}
+
+.eyebrow { color: var(--brass); }
+
+.title { font-size: var(--step-6); color: var(--bone); max-width: 14ch; }
+
+.lede {
+  color: var(--bone-mid);
+  font-size: var(--step-1);
+  line-height: 1.6;
+  max-width: 44ch;
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-7);
+  grid-template-columns: 1fr;
+  padding-block: var(--space-8) var(--space-9);
+  align-items: start;
+}
+
+.detailCol { display: flex; flex-direction: column; gap: var(--space-6); }
+
+.block { display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start; }
+
+.blockHead { color: var(--brass); }
+
+.address { font-style: normal; color: var(--bone-mid); line-height: 1.75; }
+
+.hours { display: flex; flex-direction: column; gap: var(--space-2); width: 100%; }
+
+.hourRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: var(--step--1);
+}
+
+.hourRow dt { color: var(--bone-mid); }
+.hourRow dd { margin: 0; color: var(--bone-mute); font-variant-numeric: tabular-nums; }
+
+.note { color: var(--bone-mute); font-size: var(--step--1); }
+
+.phone { font-size: var(--step-2); color: var(--bone); font-variant-numeric: tabular-nums; }
+.email { color: var(--bone-mid); }
+
+.socials { display: flex; gap: var(--space-4); margin-block-start: var(--space-2); }
+.socials a { color: var(--pistachio); font-size: var(--step--1); font-weight: 600; letter-spacing: 0.06em; }
+.socials a:hover { color: var(--pistachio-hi); }
+
+.primary {
+  margin-block-start: var(--space-2);
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background var(--fast) var(--ease);
+}
+
+.primary:hover { background: var(--pistachio-hi); }
+
+.mapCard {
+  position: relative;
+  min-height: 26rem;
+  height: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+  background:
+    radial-gradient(80% 70% at 50% 42%, color-mix(in srgb, var(--pistachio) 12%, transparent) 0%, transparent 70%),
+    var(--grounds);
+}
+
+.mapGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: 52px 52px;
+  opacity: 0.55;
+  mask-image: radial-gradient(78% 72% at 50% 42%, #000 40%, transparent 100%);
+}
+
+.mapPin {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+}
+
+.mapPinDot {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--pistachio);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--pistachio) 20%, transparent);
+}
+
+.mapPinRing {
+  position: absolute;
+  width: 54px; height: 54px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--pistachio) 42%, transparent);
+}
+
+.mapCaption {
+  position: absolute;
+  left: var(--space-5);
+  bottom: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mapCaptionName {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-2);
+  color: var(--bone);
+}
+
+.mapCaptionAddr {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-mute);
+}
+
+@media (min-width: 900px) {
+  .grid { grid-template-columns: 0.9fr 1.1fr; gap: var(--space-8); }
+}

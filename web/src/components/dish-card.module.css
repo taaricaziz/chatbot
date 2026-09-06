@@ -1,0 +1,226 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition:
+    transform var(--slow) var(--ease),
+    border-color var(--slow) var(--ease);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--pistachio) 40%, var(--rule));
+}
+
+.mediaWrap {
+  position: relative;
+}
+
+/* 4:3 is fixed here and in the Phase 4 photography, so replacing the
+   placeholder with a real <Image> causes zero layout shift. */
+.media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      120% 100% at 72% 12%,
+      hsl(var(--dish-hue) 42% 34%) 0%,
+      hsl(var(--dish-hue) 36% 20%) 46%,
+      hsl(var(--dish-hue) 30% 12%) 100%
+    );
+}
+
+.media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.42;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+.mediaMark {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(3rem, 8vw, 4.5rem);
+  line-height: 1;
+  color: color-mix(in srgb, var(--bone) 16%, transparent);
+  user-select: none;
+}
+
+.large .media {
+  aspect-ratio: 3 / 2;
+}
+
+/* ---------- badges ---------- */
+.badges {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.badge {
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+.badgeChef {
+  background: color-mix(in srgb, var(--pistachio) 88%, transparent);
+  color: var(--espresso);
+}
+
+.badgePopular {
+  background: color-mix(in srgb, var(--espresso) 70%, transparent);
+  color: var(--bone);
+  border: 1px solid color-mix(in srgb, var(--bone) 22%, transparent);
+}
+
+.soldOutTag {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--espresso) 86%, transparent);
+  backdrop-filter: blur(4px);
+  color: var(--bone-mid);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Greyed and disabled, never hidden — a regular should be able to see that
+   their usual is off today rather than wonder where it went. */
+.soldOut .media {
+  filter: grayscale(0.85) brightness(0.62);
+}
+
+.soldOut:hover {
+  transform: none;
+  border-color: var(--rule);
+}
+
+/* ---------- body ---------- */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  flex: 1;
+}
+
+.headRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.name {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-2);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+}
+
+.nameLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.card {
+  position: relative;
+}
+
+.description {
+  color: var(--bone-mute);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.footRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block-start: var(--space-2);
+  padding-block-start: var(--space-3);
+  border-top: 1px solid var(--rule-soft);
+}
+
+.price {
+  font-size: var(--step-1);
+  color: var(--bone);
+}
+
+/* Sits above the card-wide link overlay so it stays independently clickable. */
+.add {
+  position: relative;
+  z-index: 1;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pistachio) 55%, transparent);
+  color: var(--pistachio);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    background var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+
+.add:hover:not(:disabled) {
+  background: var(--pistachio);
+  color: var(--espresso);
+}
+
+.add:disabled {
+  cursor: not-allowed;
+  border-color: var(--rule);
+  color: var(--sold-out);
+}
+
+/* ---------- dietary markers ---------- */
+.diet {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.veg,
+.spicy {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: block;
+}
+
+.veg {
+  background: var(--leaf);
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--leaf) 30%, transparent);
+}
+
+.spicy {
+  background: var(--chilli);
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--chilli) 30%, transparent);
+}

@@ -1,0 +1,55 @@
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-end: var(--space-5);
+}
+
+.title { font-size: var(--step-4); color: var(--bone); }
+.muted { color: var(--bone-mute); font-size: var(--step--1); line-height: 1.6; max-width: 56ch; }
+
+.warn {
+  color: var(--brass);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  max-width: 56ch;
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
+  border-radius: var(--radius);
+}
+
+.sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: var(--space-4);
+}
+
+/* White cards on a dark console on purpose: these are printed, and a
+   dark card would drink a cartridge and scan worse. */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: #ffffff;
+  border-radius: var(--radius);
+  text-align: center;
+  break-inside: avoid;
+}
+
+.cardTop { display: flex; flex-direction: column; gap: 1px; }
+.cafe { font-size: var(--step-1); color: #191613; }
+.tableLabel { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #6b6357; }
+
+.qr { width: 100%; max-width: 9.5rem; }
+.qr :global(svg) { width: 100%; height: auto; display: block; }
+
+.instruction { font-size: 0.68rem; color: #3d3730; line-height: 1.45; max-width: 18ch; }
+.url { font-size: 0.5rem; color: #9a9086; word-break: break-all; }
+
+@media print {
+  .head { display: none; }
+  .sheet { grid-template-columns: repeat(3, 1fr); gap: 0.6cm; }
+  .card { border: 1px dashed #cccccc; }
+}

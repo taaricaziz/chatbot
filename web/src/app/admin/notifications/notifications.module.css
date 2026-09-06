@@ -1,0 +1,73 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin-block-end: var(--space-4);
+}
+
+.title { font-size: var(--step-4); color: var(--bone); }
+.muted { color: var(--bone-mute); font-size: var(--step--1); }
+.empty { color: var(--bone-mute); padding: var(--space-8) 0; text-align: center; }
+
+.notice {
+  color: var(--brass);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
+  border-radius: var(--radius);
+  margin-block-end: var(--space-5);
+  max-width: 70ch;
+}
+
+.list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+/* Anything needing a human reads before it is counted. */
+.rowFailed { border-left-color: var(--brass); }
+.rowDead { border-left-color: var(--chilli); }
+
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+
+.status {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+}
+
+.sPENDING { color: var(--bone-mute); }
+.sSENT { color: var(--pistachio); }
+.sFAILED { color: var(--brass); }
+.sDEAD { color: var(--chilli); }
+.sSENDING { color: var(--bone-mid); }
+
+.channel { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; color: var(--brass); }
+.template { font-size: 0.7rem; color: var(--bone); }
+.recipient { font-size: 0.7rem; color: var(--bone-mute); font-variant-numeric: tabular-nums; margin-inline-end: auto; }
+.attempts { font-size: 0.66rem; color: var(--bone-mute); }
+
+/* The actual message, so staff can see exactly what a customer received. */
+.preview {
+  color: var(--bone-mid);
+  font-size: var(--step--1);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  padding-inline-start: var(--space-3);
+  border-inline-start: 2px solid var(--rule-soft);
+}
+
+.error { color: var(--chilli); font-size: 0.7rem; line-height: 1.5; }

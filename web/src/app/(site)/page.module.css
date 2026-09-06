@@ -1,0 +1,709 @@
+/* ============================================================
+   Hero
+   The header sits over this transparently, so the hero owns the
+   top of the page and carries its own top padding.
+   ============================================================ */
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: min(92dvh, 54rem);
+  padding-block: var(--space-10) var(--space-6);
+  overflow: hidden;
+}
+
+.heroMedia {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Placeholder treatment for the Phase 4 photograph. Warm light pooling from
+   the upper right, the way morning sun falls across a table — built from
+   gradients so it reads as intentional rather than as a missing asset. */
+.heroWash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      70% 55% at 78% 18%,
+      color-mix(in srgb, var(--brass) 34%, transparent) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      55% 50% at 12% 82%,
+      color-mix(in srgb, var(--pistachio) 16%, transparent) 0%,
+      transparent 60%
+    ),
+    linear-gradient(168deg, var(--grounds) 0%, var(--espresso) 52%, #120f0d 100%);
+}
+
+/* Fine grain keeps the large flat gradient from banding on wide screens. */
+.heroGrain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.34'/%3E%3C/svg%3E");
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.heroEyebrow {
+  color: var(--brass);
+}
+
+.heroHeading {
+  font-size: var(--step-7);
+  color: var(--bone);
+  max-width: 17ch;
+  text-wrap: pretty;
+}
+
+/* The one italic in the whole design. Bodoni's italic is the most
+   characterful thing it does, so it gets exactly one job. */
+.heroEm {
+  font-style: italic;
+  color: var(--pistachio);
+}
+
+@media (min-width: 700px) {
+  .heroHeading {
+    max-width: 15ch;
+  }
+
+  /* Once there's room, the italic earns its own line — it's the payoff
+     of the sentence, and it shouldn't share a line with the setup. */
+  .heroEm {
+    display: block;
+  }
+}
+
+.heroBody {
+  color: var(--bone-mid);
+  font-size: var(--step-1);
+  line-height: 1.62;
+  max-width: 44ch;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-start: var(--space-2);
+}
+
+.btnPrimary,
+.btnGhost {
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.btnPrimary {
+  background: var(--pistachio);
+  color: var(--espresso);
+}
+
+.btnPrimary:hover {
+  background: var(--pistachio-hi);
+  transform: translateY(-1px);
+}
+
+.btnGhost {
+  border: 1px solid color-mix(in srgb, var(--bone) 28%, transparent);
+  color: var(--bone);
+}
+
+.btnGhost:hover {
+  border-color: var(--bone);
+  background: color-mix(in srgb, var(--bone) 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.btnText {
+  padding: 0.85rem 0.5rem;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--bone-mid);
+  white-space: nowrap;
+  transition: color var(--fast) var(--ease);
+}
+
+.btnText:hover {
+  color: var(--pistachio);
+}
+
+.heroMeta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: var(--max-page);
+  margin-inline: auto;
+  margin-block-start: var(--space-8);
+  padding-inline: var(--gutter);
+  padding-block-start: var(--space-4);
+  border-top: 1px solid color-mix(in srgb, var(--bone) 12%, transparent);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-mute);
+}
+
+.heroMetaDot {
+  color: var(--brass);
+}
+
+/* ============================================================
+   Shared section rhythm
+   ============================================================ */
+.section {
+  padding-block: var(--space-9);
+}
+
+.sectionFlush {
+  padding-block: var(--space-9);
+}
+
+.brassEyebrow {
+  color: var(--brass);
+}
+
+.inlineLink {
+  align-self: flex-start;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pistachio);
+  transition: color var(--fast) var(--ease);
+}
+
+.inlineLink:hover {
+  color: var(--pistachio-hi);
+}
+
+/* ---------- grids ---------- */
+.grid3,
+.grid2 {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 620px) {
+  .grid2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .grid3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---------- popular rail ---------- */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(15rem, 19rem);
+  gap: var(--space-5);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-inline: var(--gutter);
+  /* Without this the browser snaps to item 1 on load, scrolling the rail by
+     exactly the padding and cancelling the gutter it was meant to create. */
+  scroll-padding-inline-start: var(--gutter);
+  padding-block-end: var(--space-3);
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+
+.railItem {
+  scroll-snap-align: start;
+  display: flex;
+}
+
+.railItem > * {
+  width: 100%;
+}
+
+/* Align the rail's first card with the page gutter on wide screens while
+   still letting cards bleed off the right edge. */
+@media (min-width: 1360px) {
+  .rail {
+    padding-inline-start: max(var(--gutter), calc((100vw - var(--max-page)) / 2 + var(--gutter)));
+    scroll-padding-inline-start: max(var(--gutter), calc((100vw - var(--max-page)) / 2 + var(--gutter)));
+  }
+}
+
+/* ---------- split (breakfast) ---------- */
+.split {
+  display: grid;
+  gap: var(--space-7);
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+.splitText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.splitHeading {
+  font-size: var(--step-5);
+  color: var(--bone);
+  max-width: 16ch;
+}
+
+.splitBody {
+  color: var(--bone-mute);
+  line-height: 1.68;
+  max-width: 46ch;
+}
+
+.splitCards {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 620px) {
+  .splitCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .split {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: var(--space-8);
+  }
+}
+
+/* ---------- coffee band ---------- */
+.coffeeBand {
+  background: var(--grounds);
+  border-block: 1px solid var(--rule);
+  padding-block: var(--space-9);
+}
+
+.coffeeInner {
+  display: grid;
+  gap: var(--space-7);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.coffeeText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.coffeeHeading {
+  font-size: var(--step-4);
+  color: var(--bone);
+  max-width: 15ch;
+}
+
+.coffeeList {
+  display: flex;
+  flex-direction: column;
+}
+
+.coffeeRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.coffeeRow:first-child {
+  border-top: 1px solid var(--rule);
+}
+
+.coffeeRowMain {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.coffeeName {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-2);
+  color: var(--bone);
+  line-height: 1.2;
+}
+
+.coffeeDesc {
+  color: var(--bone-mute);
+  font-size: var(--step--1);
+  line-height: 1.55;
+}
+
+.coffeePrice {
+  font-size: var(--step-1);
+  color: var(--bone);
+  flex-shrink: 0;
+}
+
+.coffeeRowOff .coffeeName,
+.coffeeRowOff .coffeeDesc {
+  color: var(--sold-out);
+}
+
+.coffeeRowOff .coffeePrice {
+  color: var(--sold-out);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1000px) {
+  .coffeeInner {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: var(--space-8);
+  }
+}
+
+/* ---------- about ---------- */
+.aboutWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-block: var(--space-6);
+  border-block: 1px solid var(--rule);
+}
+
+.aboutHeading {
+  font-size: var(--step-5);
+  color: var(--bone);
+  max-width: 20ch;
+}
+
+.aboutCols {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: 1fr;
+  margin-block-start: var(--space-3);
+  color: var(--bone-mid);
+  line-height: 1.72;
+}
+
+@media (min-width: 800px) {
+  .aboutCols {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-7);
+  }
+}
+
+/* ---------- why us ---------- */
+.whyGrid {
+  display: grid;
+  gap: var(--space-6) var(--space-5);
+  grid-template-columns: 1fr;
+}
+
+.whyItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block-start: var(--space-4);
+  border-top: 2px solid var(--pistachio-dim);
+}
+
+.whyTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-2);
+  font-weight: 400;
+  color: var(--bone);
+}
+
+.whyBody {
+  color: var(--bone-mute);
+  font-size: var(--step--1);
+  line-height: 1.65;
+}
+
+@media (min-width: 620px) {
+  .whyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .whyGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ---------- reviews ---------- */
+.reviewGrid {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: 1fr;
+}
+
+.review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  margin: 0;
+  padding: var(--space-5);
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+}
+
+.reviewQuote {
+  margin: 0;
+  flex: 1;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-1);
+  line-height: 1.5;
+  color: var(--bone);
+  text-wrap: pretty;
+}
+
+.reviewMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-block-start: var(--space-3);
+  border-top: 1px solid var(--rule-soft);
+}
+
+.reviewName {
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--pistachio);
+}
+
+.reviewContext {
+  font-size: 0.72rem;
+  color: var(--bone-mute);
+}
+
+@media (min-width: 800px) {
+  .reviewGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---------- location ---------- */
+.locationWrap {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.locationText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.locationHeading {
+  font-size: var(--step-4);
+  color: var(--bone);
+  max-width: 14ch;
+}
+
+.locationAddress {
+  font-style: normal;
+  color: var(--bone-mid);
+  line-height: 1.75;
+}
+
+.locationHours {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+  border-block: 1px solid var(--rule);
+}
+
+.locationHourRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--step--1);
+}
+
+.locationHourRow dt {
+  color: var(--bone-mid);
+}
+
+.locationHourRow dd {
+  margin: 0;
+  color: var(--bone-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.locationActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.phoneBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.phoneLabel {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-mute);
+}
+
+.phoneNumber {
+  font-size: var(--step-0);
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Static map treatment — no Maps SDK on this page. */
+.mapCard {
+  position: relative;
+  min-height: 17rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--rule);
+  background:
+    radial-gradient(
+      80% 70% at 50% 45%,
+      color-mix(in srgb, var(--pistachio) 12%, transparent) 0%,
+      transparent 70%
+    ),
+    var(--grounds);
+  overflow: hidden;
+}
+
+.mapGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: 46px 46px;
+  opacity: 0.55;
+  mask-image: radial-gradient(75% 70% at 50% 45%, #000 40%, transparent 100%);
+}
+
+.mapPin {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+}
+
+.mapPinDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--pistachio);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pistachio) 22%, transparent);
+}
+
+.mapPinRing {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--pistachio) 45%, transparent);
+}
+
+.mapLabel {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-mute);
+}
+
+@media (min-width: 900px) {
+  .locationWrap {
+    grid-template-columns: 1fr 1.05fr;
+    gap: var(--space-8);
+  }
+}
+
+/* ---------- social ---------- */
+.socialGrid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.socialTile {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: linear-gradient(150deg, var(--grounds-hi), var(--grounds));
+  transition: border-color var(--fast) var(--ease);
+}
+
+.socialTile:hover {
+  border-color: color-mix(in srgb, var(--pistachio) 45%, var(--rule));
+}
+
+.socialMark {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-4);
+  color: color-mix(in srgb, var(--bone) 14%, transparent);
+}
+
+@media (min-width: 620px) {
+  .socialGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .socialGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

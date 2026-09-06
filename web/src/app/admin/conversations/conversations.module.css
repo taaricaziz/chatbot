@@ -1,0 +1,198 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin-block-end: var(--space-4);
+}
+
+.title { font-size: var(--step-4); color: var(--bone); }
+.muted { color: var(--bone-mute); font-size: var(--step--1); }
+.empty {
+  color: var(--bone-mute);
+  padding: var(--space-8) 0;
+  text-align: center;
+  max-width: 46ch;
+  margin-inline: auto;
+  line-height: 1.6;
+}
+
+/* The meter. Small, factual, and above the transcripts because "how much is
+   this costing" is the first question anyone asks about an AI feature. */
+.meter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  padding: var(--space-4);
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin-block-end: var(--space-5);
+}
+
+.meter div { display: flex; flex-direction: column; gap: 2px; }
+.meter strong { color: var(--bone); font-size: var(--step-0); font-weight: 500; }
+
+.meterLabel {
+  color: var(--bone-mute);
+  font-size: var(--step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.of { color: var(--bone-mute); font-weight: 400; }
+
+.free {
+  align-self: flex-start;
+  margin-block-start: 2px;
+  font-size: var(--step--2);
+  color: var(--pistachio);
+}
+
+.list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+/* Anything waiting on a person reads before anything else. */
+.rowEscalated { border-left-color: var(--brass); }
+
+.rowHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.when { color: var(--bone-mute); font-size: var(--step--1); }
+.tags { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
+.escalation,
+.order,
+.turns {
+  font-size: var(--step--2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm, 4px);
+  white-space: nowrap;
+}
+
+.escalation {
+  color: var(--brass);
+  border: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
+}
+
+.order {
+  color: var(--pistachio);
+  border: 1px solid color-mix(in srgb, var(--pistachio) 35%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.turns { color: var(--bone-mute); }
+
+.reason {
+  color: var(--brass);
+  font-size: var(--step--1);
+  line-height: 1.6;
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+}
+
+.fromUser,
+.fromBot {
+  font-size: var(--step--1);
+  line-height: 1.6;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  max-width: 62ch;
+  /* Customers paste addresses and long messages; they must not stretch the row. */
+  overflow-wrap: anywhere;
+}
+
+.fromUser {
+  color: var(--bone);
+  background: color-mix(in srgb, var(--bone) 8%, transparent);
+  align-self: flex-end;
+}
+
+.fromBot {
+  color: var(--bone-mute);
+  background: color-mix(in srgb, var(--espresso) 60%, transparent);
+  align-self: flex-start;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--step--2);
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--rule);
+}
+
+.toolOk { color: var(--bone-mute); }
+.toolFail { color: var(--chilli); }
+
+/* --- The kill switch ----------------------------------------------------
+   Above the meter and the transcripts: someone arriving at this page in a
+   hurry is here to stop the thing, not to read. */
+.switchRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin-block-end: var(--space-3);
+}
+
+.switchState { color: var(--bone); font-size: var(--step-0); }
+.switchHint {
+  color: var(--bone-mute);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  max-width: 62ch;
+}
+.rollout { color: var(--brass); }
+
+.switchOff,
+.switchOn {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Turning it OFF is the destructive direction, so it carries the warning
+   colour rather than the reassuring one. */
+.switchOff {
+  color: var(--chilli);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--chilli) 45%, transparent);
+}
+
+.switchOn {
+  color: var(--espresso);
+  background: var(--pistachio);
+  border: 1px solid var(--pistachio);
+}

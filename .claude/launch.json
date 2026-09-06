@@ -12,6 +12,13 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["backend/server.js"],
       "port": 3000
+    },
+    {
+      "name": "gootee-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "web",
+      "port": 3001
     }
   ]
 }

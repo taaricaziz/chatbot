@@ -1,0 +1,142 @@
+.footer {
+  margin-block-start: var(--space-10);
+  border-top: 1px solid var(--rule);
+  background: var(--grounds);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-7);
+  width: 100%;
+  max-width: var(--max-page);
+  margin-inline: auto;
+  padding: var(--space-8) var(--gutter) var(--space-7);
+}
+
+.brandCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.brandName {
+  font-size: var(--step-4);
+  color: var(--bone);
+}
+
+.tagline {
+  color: var(--bone-mute);
+  font-size: var(--step--1);
+  max-width: 28ch;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.colHead {
+  color: var(--brass);
+}
+
+.address {
+  font-style: normal;
+  color: var(--bone-mid);
+  font-size: var(--step--1);
+  line-height: 1.7;
+}
+
+.hours {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--step--1);
+}
+
+.hourRow {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hourRow dt {
+  color: var(--bone-mid);
+}
+
+.hourRow dd {
+  margin: 0;
+  color: var(--bone-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.phone {
+  color: var(--bone-mid);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--bone-mute);
+  font-size: var(--step--1);
+}
+
+.socials {
+  display: flex;
+  gap: var(--space-4);
+  margin-block-start: var(--space-2);
+}
+
+.link {
+  color: var(--bone-mid);
+  font-size: var(--step--1);
+  transition: color var(--fast) var(--ease);
+}
+
+.link:hover {
+  color: var(--pistachio);
+}
+
+.baseline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: var(--max-page);
+  margin-inline: auto;
+  padding: var(--space-5) var(--gutter) var(--space-6);
+  border-top: 1px solid var(--rule-soft);
+}
+
+/* Stated plainly rather than hidden in small print — this site is
+   convincing enough that it should never be mistaken for a real business. */
+.demoNotice {
+  color: var(--bone-mute);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  max-width: 64ch;
+}
+
+.baselineNav {
+  display: flex;
+  gap: var(--space-5);
+}
+
+@media (min-width: 640px) {
+  .inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .inner {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  }
+
+  .baseline {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

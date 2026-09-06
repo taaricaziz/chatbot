@@ -1,0 +1,240 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition:
+    background var(--slow) var(--ease),
+    border-color var(--slow) var(--ease),
+    backdrop-filter var(--slow) var(--ease);
+}
+
+.stuck {
+  background: color-mix(in srgb, var(--espresso) 88%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom-color: var(--rule);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: var(--max-page);
+  margin-inline: auto;
+  padding: var(--space-4) var(--gutter);
+}
+
+/* ---------- brand ---------- */
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-inline-end: auto;
+}
+
+.brandName {
+  font-size: var(--step-2);
+  line-height: 1;
+  color: var(--bone);
+}
+
+/* The name alone doesn't say what the cafe is, so the descriptor is part of
+   the lockup rather than decoration — it carries the positioning. */
+.brandDescriptor {
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-mute);
+  white-space: nowrap;
+  transition: color var(--fast) var(--ease);
+}
+
+.brand:hover .brandDescriptor {
+  color: var(--pistachio);
+}
+
+/* ---------- desktop nav ---------- */
+.nav {
+  display: none;
+  align-items: center;
+  gap: clamp(var(--space-3), 1.8vw, var(--space-5));
+}
+
+.navLink {
+  position: relative;
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-mid);
+  padding-block: var(--space-2);
+  white-space: nowrap;
+  transition: color var(--fast) var(--ease);
+}
+
+.navLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--pistachio);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--slow) var(--ease);
+}
+
+.navLink:hover {
+  color: var(--bone);
+}
+
+.navLink:hover::after {
+  transform: scaleX(1);
+}
+
+/* ---------- actions ---------- */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cart {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  color: var(--bone-mid);
+  transition:
+    color var(--fast) var(--ease),
+    background var(--fast) var(--ease);
+}
+
+.cart:hover {
+  color: var(--bone);
+  background: var(--grounds-hi);
+}
+
+.cartCount {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding-inline: 3px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.orderBtn {
+  display: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.orderBtn:hover {
+  background: var(--pistachio-hi);
+  transform: translateY(-1px);
+}
+
+/* ---------- burger ---------- */
+.burger {
+  display: grid;
+  gap: 5px;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-content: center;
+}
+
+.burgerBar {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: var(--bone);
+  transition: transform var(--fast) var(--ease), opacity var(--fast) var(--ease);
+}
+
+.barTop {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.barMid {
+  opacity: 0;
+}
+
+.barBot {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* ---------- drawer ---------- */
+
+/* The author `display: flex` below outranks the UA stylesheet's
+   `[hidden] { display: none }`, so the attribute alone would not hide it. */
+.drawer[hidden] {
+  display: none;
+}
+
+.drawer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--gutter) var(--space-7);
+  background: var(--espresso);
+  border-top: 1px solid var(--rule);
+  height: calc(100dvh - 4.5rem);
+}
+
+.drawerLink {
+  display: block;
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--rule-soft);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-3);
+  color: var(--bone);
+}
+
+.drawerCta {
+  margin-block-start: var(--space-5);
+  padding: var(--space-4);
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: var(--step--1);
+}
+
+@media (min-width: 900px) {
+  .nav,
+  .orderBtn {
+    display: flex;
+  }
+
+  .burger,
+  .drawer {
+    display: none;
+  }
+}

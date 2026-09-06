@@ -1,0 +1,85 @@
+.layout { display: grid; gap: var(--space-6); grid-template-columns: 1fr; align-items: start; }
+.muted { color: var(--bone-mute); font-size: var(--step--1); }
+.fields { display: flex; flex-direction: column; gap: var(--space-6); }
+.group { border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.legend { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass); margin-block-end: var(--space-2); }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.field { display: flex; flex-direction: column; gap: var(--space-2); }
+.field > span { font-size: var(--step--1); color: var(--bone-mid); }
+.field em { font-style: normal; color: var(--bone-mute); font-size: 0.72rem; }
+.field input, .field textarea, .field select {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: var(--grounds);
+  color: var(--bone);
+  font-size: var(--step-0);
+  transition: border-color var(--fast) var(--ease);
+  resize: vertical;
+}
+.field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--pistachio); }
+/* Dark-scheme native pickers, so the date field is not a white box. */
+.field input[type="date"] { color-scheme: dark; }
+
+.segmented { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.segment { flex: 1; min-width: 7rem; padding: var(--space-3); border-radius: var(--radius); border: 1px solid var(--rule); color: var(--bone-mid); font-size: var(--step--1); font-weight: 600; transition: background var(--fast) var(--ease), color var(--fast) var(--ease), border-color var(--fast) var(--ease); }
+.segment:hover { border-color: var(--bone-mute); color: var(--bone); }
+.segmentOn { background: var(--pistachio); border-color: var(--pistachio); color: var(--espresso); }
+
+/* ---------- slots ---------- */
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr)); gap: var(--space-2); }
+.slot {
+  padding: 0.6rem 0.4rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  color: var(--bone-mid);
+  font-size: var(--step--1);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease), border-color var(--fast) var(--ease);
+}
+.slot:hover:not(:disabled) { border-color: var(--pistachio); color: var(--bone); }
+.slotOn { background: var(--pistachio); border-color: var(--pistachio); color: var(--espresso); }
+.slotOn:hover { background: var(--pistachio-hi); color: var(--espresso); }
+/* Taken slots stay visible but plainly dead — hiding them makes the day look
+   emptier than it is and gives no sense of how busy the room gets. */
+.slot:disabled { color: var(--sold-out); border-color: var(--rule-soft); text-decoration: line-through; cursor: not-allowed; }
+
+.noneLeft { color: var(--bone-mid); font-size: var(--step--1); line-height: 1.65; padding: var(--space-4); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--grounds); }
+
+/* ---------- summary ---------- */
+.summary { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-5); background: var(--grounds); border: 1px solid var(--rule); border-radius: var(--radius-lg); position: sticky; top: 5.5rem; }
+.summaryHeading { font-size: var(--step-3); color: var(--bone); }
+.summaryList { display: flex; flex-direction: column; gap: var(--space-2); padding-block: var(--space-4); border-block: 1px solid var(--rule); }
+.summaryList > div { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--step--1); }
+.summaryList dt { color: var(--bone-mid); }
+.summaryList dd { margin: 0; color: var(--bone); }
+
+.alts { display: flex; flex-direction: column; gap: var(--space-2); }
+.altsHead { color: var(--pistachio); font-size: var(--step--1); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.primary, .confirm {
+  padding: 0.9rem 1.75rem; border-radius: 999px;
+  background: var(--pistachio); color: var(--espresso);
+  font-size: var(--step--1); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-align: center;
+  transition: background var(--fast) var(--ease);
+}
+.primary:hover:not(:disabled), .confirm:hover:not(:disabled) { background: var(--pistachio-hi); }
+.primary:disabled, .confirm:disabled { background: var(--rule); color: var(--sold-out); cursor: not-allowed; }
+
+.error { color: var(--chilli); font-size: var(--step--1); line-height: 1.55; }
+
+/* ---------- review ---------- */
+.review { display: flex; flex-direction: column; gap: var(--space-4); max-width: 38rem; padding: var(--space-6); background: var(--grounds); border: 1px solid var(--rule); border-radius: var(--radius-lg); }
+.reviewHeading { font-size: var(--step-4); color: var(--bone); }
+.reviewLede { color: var(--bone-mute); font-size: var(--step--1); line-height: 1.6; }
+.reviewList { display: flex; flex-direction: column; gap: var(--space-2); padding-block: var(--space-4); border-block: 1px solid var(--rule); }
+.reviewList > div { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--step--1); }
+.reviewList dt { color: var(--bone-mute); }
+.reviewList dd { margin: 0; color: var(--bone); text-align: right; }
+.reviewActions { display: flex; flex-direction: column; gap: var(--space-3); }
+.back { color: var(--bone-mute); font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase; }
+.back:hover { color: var(--bone); }
+
+@media (min-width: 1000px) { .layout { grid-template-columns: 1.4fr 0.85fr; gap: var(--space-8); } }

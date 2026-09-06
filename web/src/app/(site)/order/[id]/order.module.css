@@ -1,0 +1,145 @@
+.wrap {
+  padding-block: var(--space-10) var(--space-9);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.header { display: flex; flex-direction: column; gap: var(--space-3); }
+.eyebrow { color: var(--pistachio); }
+
+.number {
+  font-size: var(--step-6);
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.lede {
+  color: var(--bone-mid);
+  font-size: var(--step-1);
+  line-height: 1.6;
+  max-width: 46ch;
+}
+
+/* ---------- status track ---------- */
+.track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+}
+
+.stage { display: flex; flex-direction: column; gap: var(--space-2); position: relative; }
+
+/* The connector sits behind the dots and stops at the first/last one so the
+   line never runs off either end of the track. */
+.stage::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--rule);
+}
+
+.stage:first-child::before { left: 6px; }
+.stage:last-child::before { right: calc(100% - 6px); }
+
+.stageDot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  position: relative;
+  z-index: 1;
+}
+
+.stageLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-mute);
+}
+
+.stageDone .stageDot { background: var(--pistachio); border-color: var(--pistachio); }
+.stageDone .stageLabel { color: var(--bone); }
+.stageDone::before { background: var(--pistachio); }
+
+/* ---------- cards ---------- */
+.grid { display: grid; gap: var(--space-5); grid-template-columns: 1fr; align-items: stretch; }
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+}
+
+.cardHead { color: var(--brass); }
+
+.items { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.items li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--step--1);
+  color: var(--bone-mid);
+}
+
+.items li span:last-child { color: var(--bone); font-variant-numeric: tabular-nums; }
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+  border-block: 1px solid var(--rule);
+}
+
+.totalRow { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--step--1); }
+.totalRow dt { color: var(--bone-mid); }
+.totalRow dd { margin: 0; color: var(--bone); font-variant-numeric: tabular-nums; }
+.grand dt { color: var(--bone); font-weight: 600; }
+.grand dd { font-size: var(--step-2); }
+
+.payNote { color: var(--bone-mute); font-size: var(--step--1); letter-spacing: 0.04em; }
+.address { font-style: normal; color: var(--bone-mid); line-height: 1.7; }
+.link { color: var(--pistachio); font-size: var(--step--1); font-weight: 600; align-self: flex-start; }
+.link:hover { color: var(--pistachio-hi); }
+.notes { color: var(--bone-mid); font-size: var(--step--1); line-height: 1.6; }
+
+.help {
+  color: var(--bone-mute);
+  font-size: 0.74rem;
+  line-height: 1.6;
+  margin-block-start: auto;
+  padding-block-start: var(--space-3);
+}
+
+.help strong { color: var(--bone); font-variant-numeric: tabular-nums; }
+
+.actions { display: flex; gap: var(--space-3); }
+
+.primary {
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.primary:hover { background: var(--pistachio-hi); }
+
+@media (min-width: 860px) {
+  .grid { grid-template-columns: 1.2fr 1fr; gap: var(--space-6); }
+}

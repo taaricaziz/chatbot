@@ -1,0 +1,125 @@
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-block: var(--space-10) var(--space-7);
+  border-bottom: 1px solid var(--rule);
+}
+
+.eyebrow { color: var(--brass); }
+
+.title {
+  font-size: var(--step-6);
+  color: var(--bone);
+  max-width: 16ch;
+}
+
+.lede {
+  color: var(--bone-mid);
+  font-size: var(--step-1);
+  line-height: 1.6;
+  max-width: 46ch;
+}
+
+.story { padding-block: var(--space-8); }
+
+.storyCols {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: 1fr;
+  color: var(--bone-mid);
+  line-height: 1.78;
+  max-width: 78ch;
+}
+
+.sectionTitle {
+  font-size: var(--step-4);
+  color: var(--bone);
+  margin-block-end: var(--space-6);
+}
+
+.principles {
+  padding-block: var(--space-8);
+  border-block: 1px solid var(--rule);
+}
+
+.principleList {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+}
+
+.principle {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.principleNum {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-2);
+  color: var(--pistachio);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.principleBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.principleTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-2);
+  font-weight: 400;
+  color: var(--bone);
+}
+
+.principleText {
+  color: var(--bone-mute);
+  line-height: 1.68;
+  max-width: 54ch;
+}
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding-block: var(--space-9);
+}
+
+.ctaTitle {
+  font-size: var(--step-5);
+  color: var(--bone);
+}
+
+.ctaActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.primary,
+.ghost {
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease);
+}
+
+.primary { background: var(--pistachio); color: var(--espresso); }
+.primary:hover { background: var(--pistachio-hi); }
+.ghost { border: 1px solid color-mix(in srgb, var(--bone) 28%, transparent); color: var(--bone); }
+.ghost:hover { border-color: var(--bone); }
+
+@media (min-width: 800px) {
+  .storyCols { grid-template-columns: repeat(2, 1fr); gap: var(--space-6) var(--space-7); }
+  .principleList { grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+}

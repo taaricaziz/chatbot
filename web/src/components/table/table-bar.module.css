@@ -1,0 +1,107 @@
+.bar {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.barCount {
+  display: grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding-inline: 0.35rem;
+  border-radius: 999px;
+  background: var(--espresso);
+  color: var(--pistachio);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.barLabel { flex: 1; text-align: left; font-size: var(--step--1); text-transform: uppercase; }
+.barTotal { font-size: var(--step-1); font-variant-numeric: tabular-nums; }
+
+.sentBar { background: var(--grounds); color: var(--bone); border: 1px solid var(--pistachio); justify-content: space-between; }
+.sentText { font-size: var(--step--1); }
+.sentLink { color: var(--pistachio); font-size: var(--step--1); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- sheet ---------- */
+.sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 61;
+  max-height: 76dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) 5.5rem;
+  background: var(--grounds);
+  border-top: 1px solid var(--rule);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 -14px 40px rgb(0 0 0 / 0.5);
+}
+
+.sheetHead { display: flex; align-items: center; justify-content: space-between; }
+.sheetTitle { font-size: var(--step-3); color: var(--bone); }
+.sheetHead button { font-size: 1.5rem; line-height: 1; color: var(--bone-mute); }
+.sheetHead button:hover { color: var(--bone); }
+
+.sheetList { display: flex; flex-direction: column; }
+.sheetRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "name price" "qty remove";
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--rule-soft);
+}
+.sheetName { grid-area: name; font-family: var(--font-display), Georgia, serif; font-size: var(--step-1); color: var(--bone); }
+.sheetPrice { grid-area: price; color: var(--bone); justify-self: end; }
+.qty { grid-area: qty; display: flex; align-items: center; gap: var(--space-2); border: 1px solid var(--rule); border-radius: 999px; padding: 0.15rem; justify-self: start; }
+.qty button { width: 1.8rem; height: 1.8rem; display: grid; place-items: center; border-radius: 50%; color: var(--bone-mid); }
+.qty button:hover { background: var(--grounds-hi); color: var(--bone); }
+.qty span { min-width: 1.3rem; text-align: center; color: var(--bone); font-variant-numeric: tabular-nums; }
+.removeBtn { grid-area: remove; justify-self: end; color: var(--bone-mute); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.removeBtn:hover { color: var(--chilli); }
+
+.totals { display: flex; flex-direction: column; gap: var(--space-2); padding-block: var(--space-3); border-block: 1px solid var(--rule); }
+.totals > div { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--step--1); }
+.totals dt { color: var(--bone-mid); }
+.totals dd { margin: 0; color: var(--bone); font-variant-numeric: tabular-nums; }
+.grand dt { color: var(--bone); font-weight: 600; }
+.grand dd { font-size: var(--step-2); }
+
+.send {
+  padding: 0.95rem 1.75rem;
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.send:hover:not(:disabled) { background: var(--pistachio-hi); }
+.send:disabled { background: var(--rule); color: var(--sold-out); cursor: not-allowed; }
+
+.note { color: var(--bone-mute); font-size: 0.72rem; }
+.error { color: var(--chilli); font-size: var(--step--1); }
+
+@media (min-width: 700px) {
+  .bar { left: auto; right: var(--space-6); min-width: 22rem; }
+  .sheet { left: auto; right: var(--space-6); bottom: var(--space-6); width: min(30rem, calc(100vw - var(--space-8))); border-radius: var(--radius-lg); border: 1px solid var(--rule); padding-bottom: var(--space-5); max-height: 70dvh; }
+  .sheetRow { grid-template-columns: 1fr auto auto auto; grid-template-areas: "name qty price remove"; gap: var(--space-4); }
+}

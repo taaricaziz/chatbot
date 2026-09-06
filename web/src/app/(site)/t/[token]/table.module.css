@@ -1,0 +1,14 @@
+.intro { padding-block: var(--space-9) var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start; }
+.eyebrow { color: var(--pistachio); }
+.title { font-size: var(--step-5); color: var(--bone); }
+.lede { color: var(--bone-mid); line-height: 1.65; max-width: 48ch; }
+.billLink { color: var(--pistachio); font-size: var(--step--1); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-block-start: var(--space-2); }
+.billLink:hover { color: var(--pistachio-hi); }
+
+.menu { padding-block-end: 7rem; }
+.catSection { margin-block-end: var(--space-8); }
+.catHeading { font-size: var(--step-4); color: var(--bone); margin-block-end: var(--space-4); padding-block-end: var(--space-3); border-bottom: 1px solid var(--rule); }
+.grid { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
+
+@media (min-width: 640px)  { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .grid { grid-template-columns: repeat(3, 1fr); } }

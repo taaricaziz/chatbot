@@ -1,0 +1,157 @@
+.launcher {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.75rem 1.2rem;
+  border-radius: 999px;
+  background: var(--grounds);
+  border: 1px solid color-mix(in srgb, var(--pistachio) 45%, transparent);
+  color: var(--pistachio);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.launcher:hover { background: var(--pistachio); color: var(--espresso); }
+
+.panel {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: 56;
+  display: flex;
+  flex-direction: column;
+  max-height: min(32rem, 78dvh);
+  background: var(--grounds);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 48px rgb(0 0 0 / 0.55);
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.title { font-size: var(--step-2); color: var(--bone); line-height: 1.1; }
+.subtitle { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bone-mute); }
+.head button { font-size: 1.4rem; line-height: 1; color: var(--bone-mute); }
+.head button:hover { color: var(--bone); }
+
+.log {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+
+.hint { color: var(--bone-mute); font-size: var(--step--1); line-height: 1.6; }
+
+.fromUser, .fromBot {
+  max-width: 85%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.fromUser { align-self: flex-end; background: var(--pistachio); color: var(--espresso); border-bottom-right-radius: var(--radius-sm); }
+.fromBot { align-self: flex-start; background: var(--grounds-hi); color: var(--bone); border-bottom-left-radius: var(--radius-sm); }
+
+.typing { align-self: flex-start; color: var(--bone-mute); font-size: var(--step--1); font-style: italic; }
+.error { color: var(--chilli); font-size: var(--step--1); }
+
+.composer { display: flex; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--rule); }
+
+.composer input {
+  flex: 1;
+  padding: var(--space-3);
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--espresso);
+  color: var(--bone);
+  font-size: var(--step--1);
+}
+
+.composer input:focus { outline: none; border-color: var(--pistachio); }
+
+.composer button {
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  background: var(--pistachio);
+  color: var(--espresso);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.composer button:disabled { background: var(--rule); color: var(--sold-out); cursor: not-allowed; }
+
+.disclosure {
+  padding: 0 var(--space-4) var(--space-3);
+  color: var(--bone-mute);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .panel { left: auto; width: 24rem; }
+}
+
+/* --- Streaming --------------------------------------------------------- */
+
+/* A caret on the reply being written, so a pause between tokens reads as
+   thinking rather than as finished. */
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-inline-start: 2px;
+  vertical-align: text-bottom;
+  background: var(--pistachio);
+  animation: blink 1s step-end infinite;
+}
+
+/* Three dots that fill in, so the status line is visibly alive even when a
+   tool takes a few seconds. */
+.dots::after {
+  content: "";
+  animation: dots 1.2s steps(4, end) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@keyframes dots {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%  { content: "..."; }
+}
+
+/* Both are decoration on top of text that is already legible, so they simply
+   stop rather than needing a replacement. */
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; }
+  .dots::after { content: "…"; animation: none; }
+}
