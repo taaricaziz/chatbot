@@ -19,9 +19,17 @@ delete or "improve" anything outside `web/` unless explicitly asked. That
 includes `vercel.json`, `package.json` at the repo root, and
 `.claude/launch.json` — append to them, never rewrite them.
 
-The two apps deliberately have **separate menus**: CafeBot reads
-`data/menu.json` in USD, the website reads PostgreSQL in PKR. They are
-expected to differ. Do not "sync" them without being asked.
+**The one exception to frozen:** `data/menu.json` and the thresholds in
+`data/promotions.json`. CafeBot can now answer the website's chat widget
+(see "Two brains" below), so its menu is **generated from the website's**
+— `web/src/lib/menu-seed.ts`, in PKR, whole rupees — and must never be
+hand-edited. Regenerate it the way the database seed is generated. Before
+this, CafeBot quoted a USD menu that shared nothing with the site's; a
+Karachi customer would have been offered a $5.50 Pumpkin Spice Latte.
+
+Still frozen, and still wrong for PKR: `backend/orderMath.js` hardcodes an
+8% flat tax and a `3.0` delivery fee (Rs. 3). Changing that is a code change
+to CafeBot and needs explicit approval.
 
 ---
 
@@ -268,6 +276,30 @@ bookable — skipping CANCELLED and NO_SHOW. Do not add a second one.
 A free Supabase project pauses after about a week idle. If the site suddenly
 cannot connect, check whether the project needs restoring before debugging
 anything else.
+
+## Two brains, one widget
+
+`AGENT_BRAIN` decides who writes the words in the chat widget; the widget,
+rate limit, kill switch, rollout, transcript and daily call caps are the
+same either way.
+
+- **`local`** (default) — `web/src/agent/`, on whichever model provider is
+  configured. Streams. Places orders in the site's database.
+- **`cafebot`** — the original CafeBot in `backend/`, deployed separately
+  and asked over HTTP at `CAFEBOT_URL`. Its own prompt, tools and **its own
+  order store** (`data/orders.json` on its deployment — the site's admin
+  console does not see those orders). Runs on Anthropic via its own key, so
+  the call caps matter *more*, not less. Does not stream.
+
+`agentBrain()` in `lib/agent-config.ts` is the only place that reads the
+setting. `lib/channels/cafebot.ts` is the only file that knows CafeBot's
+HTTP contract (`POST /api/chat {message, history, sessionId}`); the widget's
+`conversationId` is passed as CafeBot's `sessionId`, so one value groups the
+quota, the transcript and CafeBot's cart.
+
+Known limitation inherited from CafeBot: its cart lives in process memory
+(`backend/orderState.js`), so on a serverless host a cold start between two
+messages loses the cart. That is CafeBot's architecture, frozen.
 
 ## Scope discipline
 

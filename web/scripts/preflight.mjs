@@ -57,13 +57,27 @@ const configured = Object.keys(PROVIDER_KEYS).filter(
 );
 const pinned = (process.env.AGENT_PROVIDER ?? "").trim().toLowerCase();
 
-if (configured.length === 0 && pinned !== "ollama") {
+// A second brain: the original CafeBot, asked over HTTP. When it is the one
+// answering, a missing model key is irrelevant and a missing URL is fatal.
+const brain = (process.env.AGENT_BRAIN ?? "").trim().toLowerCase();
+const cafebotUrl = (process.env.CAFEBOT_URL ?? "").trim();
+if (brain === "cafebot" && !cafebotUrl) {
+  problems.push(
+    "AGENT_BRAIN is cafebot but CAFEBOT_URL is not set — the widget would " +
+      "fall back to the local agent, or to nothing if no model key is set either.",
+  );
+}
+if (brain === "cafebot" && cafebotUrl && !cafebotUrl.startsWith("https://")) {
+  warnings.push(`CAFEBOT_URL is not https (${cafebotUrl}) — customer messages would cross the network in the clear.`);
+}
+
+if (brain !== "cafebot" && configured.length === 0 && pinned !== "ollama") {
   warnings.push(
     "No model provider key is set — the assistant will be unavailable. " +
       "A free key from console.groq.com/keys or aistudio.google.com/apikey " +
       "is enough; free providers are preferred automatically.",
   );
-} else if (configured.length > 0) {
+} else if (brain !== "cafebot" && configured.length > 0) {
   const free = configured.filter((name) => PROVIDER_KEYS[name] !== "anthropic");
   if (free.length === 0 && !pinned) {
     warnings.push(

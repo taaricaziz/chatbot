@@ -8,7 +8,11 @@ import {
 } from "@/agent/runtime";
 import { clientKey, hit, RULES } from "@/lib/rate-limit";
 import { appendTranscript } from "@/lib/repositories/transcripts";
-import { agentEnabled } from "@/lib/agent-config";
+import { agentBrain, agentEnabled } from "@/lib/agent-config";
+import { askCafeBot, CafeBotError } from "@/lib/channels/cafebot";
+import { budget } from "@/agent/runtime";
+import { checkBudget, exhaustedMessage } from "@/lib/services/spend";
+import { readLedger, recordSpend } from "@/lib/repositories/spend-ledger";
 
 /**
  * POST /api/agent/chat
@@ -71,6 +75,43 @@ const BUSY =
   "Lots of people are asking at once — give me about a minute and try " +
   "again. The menu and checkout work as normal in the meantime.";
 
+/** Server-sent events from a fixed list, for replies that arrive whole. */
+function sse(events: unknown[]): Response {
+  const encoder = new TextEncoder();
+  const body = events.map((e) => `data: ${JSON.stringify(e)}
+
+`).join("");
+  return new Response(encoder.encode(body), {
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-store, no-transform",
+    },
+  });
+}
+
+/**
+ * A reply that arrived all at once, in whichever shape the caller asked for.
+ * The streaming shape is one text delta then done, so the widget code path
+ * is identical to a streamed reply — it just happens fast.
+ */
+function respond(
+  stream: boolean,
+  result: { reply: string; conversationId: string; exhausted: boolean },
+): Response {
+  if (stream) {
+    return sse([
+      { type: "text", delta: result.reply },
+      { type: "done", reply: result.reply, truncated: false,
+        exhausted: result.exhausted, conversationId: result.conversationId },
+    ]);
+  }
+  return NextResponse.json(
+    { reply: result.reply, toolTrace: [], truncated: false,
+      exhausted: result.exhausted, conversationId: result.conversationId },
+    { headers: { "Cache-Control": "no-store" } },
+  );
+}
+
 export async function POST(request: Request) {
   // Rate limit BEFORE parsing the body: a flood should cost as little as
   // possible to reject.
@@ -126,6 +167,50 @@ export async function POST(request: Request) {
   const wantsStream = (request.headers.get("accept") ?? "").includes(
     "text/event-stream",
   );
+
+  // ---------------------------------------------------------------- CafeBot
+  // The original assistant, asked over HTTP. It shares everything above —
+  // the rate limit, the kill switch, validation, the transcript — and the
+  // call caps below, because it runs on a paid model and an unmetered brain
+  // is somebody else's budget to spend. What it cannot do is stream, so the
+  // reply arrives as one delta.
+  if (agentBrain() === "cafebot") {
+    const verdict = checkBudget(readLedger(conversationId), budget());
+    if (!verdict.allowed) {
+      const reply = exhaustedMessage(verdict.reason!);
+      record({ reply, toolTrace: [], truncated: false, exhausted: true,
+               costMicroUsd: 0, provider: "cafebot", model: "cafebot" });
+      return respond(wantsStream, { reply, conversationId, exhausted: true });
+    }
+
+    try {
+      const answer = await askCafeBot({ message, history, sessionId: conversationId });
+      // Counted as one call; CafeBot's own bill is not ours to estimate.
+      recordSpend(conversationId, 0);
+
+      // CafeBot's confirmed order id, surfaced in the console like a local
+      // order number would be.
+      const toolTrace = answer.orderId
+        ? [{ name: "cafebot", input: { status: answer.orderStatus ?? "confirmed" },
+             ok: true, orderNumber: answer.orderId }]
+        : [];
+
+      record({ reply: answer.reply, toolTrace, truncated: false,
+               costMicroUsd: 0, provider: "cafebot", model: "cafebot" });
+      return respond(wantsStream, { reply: answer.reply, conversationId, exhausted: false });
+    } catch (error) {
+      const retryable = error instanceof CafeBotError && error.retryable;
+      console.warn("[agent/chat] cafebot:", error instanceof Error ? error.message : error);
+      const message = retryable ? BUSY : RESTING;
+      if (wantsStream) {
+        return sse([{ type: "error", message }]);
+      }
+      return NextResponse.json(
+        { error: { code: retryable ? "BUSY" : "UNAVAILABLE", message } },
+        { status: 503, ...(retryable ? { headers: { "Retry-After": "30" } } : {}) },
+      );
+    }
+  }
 
   if (!wantsStream) {
     try {

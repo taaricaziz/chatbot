@@ -1,9 +1,8 @@
 import { requireStaff } from "@/lib/auth";
 import { listTranscripts } from "@/lib/repositories/transcripts";
 import { spendSummary } from "@/lib/repositories/spend-ledger";
-import { resolveProvider } from "@/agent/provider";
 import { readSwitch } from "@/lib/repositories/agent-switch";
-import { rolloutPercent } from "@/lib/agent-config";
+import { describeBrain, rolloutPercent } from "@/lib/agent-config";
 import { toggleAssistant } from "./actions";
 import { DEFAULT_BUDGET, formatUsd } from "@/lib/services/spend";
 import styles from "./conversations.module.css";
@@ -23,7 +22,8 @@ export default async function ConversationsPage() {
 
   const transcripts = listTranscripts(50);
   const spend = spendSummary();
-  const provider = resolveProvider();
+  // Whichever brain is answering: the local agent's provider, or CafeBot.
+  const provider = describeBrain();
 
   const escalated = transcripts.filter((t) => t.escalated);
   const killSwitch = readSwitch();

@@ -56,7 +56,8 @@ function systemPrompt(): string {
  * Read per call rather than at module load so changing it needs no redeploy
  * on platforms that inject env at runtime.
  */
-function budget(): Budget {
+/** Exported so a non-local brain (CafeBot) is held to the same call caps. */
+export function budget(): Budget {
   const int = (name: string, fallback: number) => {
     const raw = Number(process.env[name]);
     return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : fallback;
