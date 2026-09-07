@@ -2,14 +2,14 @@
   "promotions": [
     {
       "id": "promo-01",
-      "name": "10% Off Orders Over $20",
-      "rule": "Get 10% off your entire order when your subtotal is $20 or more.",
+      "name": "10% Off Orders Over Rs. 2,000",
+      "rule": "Get 10% off your entire order when your subtotal is Rs. 2,000 or more.",
       "discount": {
         "type": "percentage",
         "value": 10
       },
       "eligibility": {
-        "minSubtotal": 20.00
+        "minSubtotal": 2000
       },
       "active": true
     },
@@ -26,7 +26,7 @@
         "requiresSize": "Large",
         "freeItemCategory": "Pastries"
       },
-      "active": true
+      "active": false
     },
     {
       "id": "promo-03",
