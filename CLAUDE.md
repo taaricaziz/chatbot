@@ -305,3 +305,15 @@ messages loses the cart. That is CafeBot's architecture, frozen.
 
 Build only the current phase. Each phase ends deployable. Do not get ahead
 of the build sequence, and do not touch anything outside `web/`.
+
+---
+
+# The NICL website redesign (`nicl/`)
+
+A third, independent deliverable: a ground-up redesign of nicl.com.pk
+(National Insurance Company Limited, the Government of Pakistan's insurer of
+public property). It is a **static site with no build step**: eight HTML
+pages, `assets/site.css` (all tokens live there) and `assets/site.js`. It
+shares nothing with CafeBot or the café website and must not import from
+either. See `nicl/README.md` for what is real content and what is marked as
+an example placeholder.
